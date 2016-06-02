@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core">
+    <h:head>
+        <title>Facelet Title</title>
+        <h:outputStylesheet library="css" name="style_main.css"  />
+    </h:head>
+    <h:body>
+
+        <ui:composition>
+
+            <div class="logo">
+                <h:graphicImage library="images" name="library.png" />
+            </div>
+
+            <div class="descr">
+                <h3>#{msg.index_title}</h3>
+            </div>
+
+            <div class="welcome">  
+                <ui:include src="/templates/locales.xhtml"/>
+                <h:form>
+                    <h5>#{msg.welcome},  #{user.login}</h5>
+                    <h:commandLink action="#{user.logout()}" value="#{msg.exit}"/>
+                </h:form>
+            </div>
+
+            <div class="search_div">
+                <h:form styleClass="search_form" id="searchForm">
+                    <h:inputText id="search_string" styleClass="search_string" value="#{booksListController.searchString}"
+                                 valueChangeListener="#{booksListController.searchStringChanged}" >
+                        <f:ajax  event="change" />
+                    </h:inputText>
+                    <h:selectOneMenu value="#{booksListController.searchType}" styleClass="search_option" 
+                                     valueChangeListener="#{booksListController.searchTypeChanged}">
+                        <f:selectItems value="${searchTypeController.searchList}" />
+                        <f:ajax event="change"/>
+                    </h:selectOneMenu>
+                    <h:commandButton value="#{msg.search}" styleClass="search_button" >
+                        <f:ajax execute="@form" listener="#{booksListController.fillBookBySearchString()}" onevent="showProgress"
+                                render="@form :booksCount :pager1 :pager2 :booksForm:bookList :genresForm :letterForm" />
+                    </h:commandButton>
+                </h:form>
+            </div>
+
+            <div class="letters">
+                <h:form id="letterForm">
+                    <ui:repeat value="#{lettersController.lettersArray}" var="letter">
+                        <h:commandLink value="#{letter}"
+                                       styleClass="#{letter == booksListController.selectedLetter ? 'selected_letter' : ''}">
+                            <f:param name="letter" value="#{letter}" />
+                            <f:ajax event="click" listener="#{booksListController.fillBooksListByLetter()}" onevent="showProgress"
+                                    render="@form :booksCount :pager1 :pager2 :booksForm:bookList :genresForm" />
+                        </h:commandLink>
+                    </ui:repeat>
+                </h:form>
+            </div>
+
+        </ui:composition>
+
+    </h:body>
+</html>
+
